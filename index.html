@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trình Luyện Tập Trắc Nghiệm - Tư Tưởng Hồ Chí Minh (Nhóm 5)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --silk-red-deep: #5e0208;
+      --silk-red-mid: #9c0f1c;
+      --silk-red-light: #bf1828;
+      --cream-bg: #fffbf5;
+      --gold-primary: #f6b819;
+      --gold-bright: #ffe66d;
+      --gold-dark: #b8860b;
+      --card-border: #d49a36;
+      --text-maroon: #730d14;
+      --text-dark: #220205;
+      --correct-green: #1b5e20;
+      --correct-light: #e8f5e9;
+      --wrong-red: #b71c1c;
+      --wrong-light: #ffebee;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #420205 0%, #7d0b15 50%, #420205 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* KHUNG SLIDE TRÌNH CHIẾU TỶ LỆ CHUẨN */
+    .slide-canvas {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--silk-red-mid);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 215, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 680px;
+    }
+
+    /* LỚP NỀN LỤA ĐỎ CÓ NẾP GẤP & TRỐNG ĐỒNG */
+    .slide-canvas::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(circle at 18% 25%, rgba(255, 30, 50, 0.4) 0%, transparent 45%),
+        linear-gradient(115deg, rgba(50,0,5,0.7) 0%, transparent 40%, rgba(30,0,4,0.6) 100%),
+        radial-gradient(circle at 15% 30%, transparent 20%, rgba(0, 0, 0, 0.25) 70%),
+        repeating-radial-gradient(circle at 16% 28%, transparent 0, transparent 15px, rgba(255, 204, 0, 0.04) 16px, transparent 20px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ĐƯỜNG CONG HÌNH CHIM BỒ CÂU TRẮNG TẠO MẢNG KEM (NHƯ SLIDE 2 & 3) */
+    .dove-curve-layer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 82%;
+      height: 100%;
+      background: radial-gradient(ellipse at 80% 20%, #ffffff 0%, var(--cream-bg) 70%);
+      clip-path: path("M 220 0 C 130 90, 80 180, 110 270 C 130 320, 100 370, 70 390 C 20 420, 10 460, 40 520 C 70 580, 150 630, 260 700 L 1100 700 L 1100 0 Z");
+      z-index: 2;
+      box-shadow: -15px 0 35px rgba(0, 0, 0, 0.35);
+      border-left: 3px solid rgba(255, 215, 0, 0.4);
+    }
+
+    /* BIỂU TƯỢNG BÚA LIỀM & SAO VÀNG GÓC TRÁI (NHƯ SLIDE) */
+    .party-emblem {
+      position: absolute;
+      top: 25px;
+      left: 28px;
+      z-index: 3;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+    }
+
+    .party-emblem svg {
+      width: 44px;
+      height: 44px;
+      fill: var(--gold-bright);
+    }
+
+    /* LOGO TRƯỜNG VNU - TRƯỜNG QUỐC TẾ (IS) & NHÓM 5 GÓC TRÊN PHẢI */
+    .branding-corner {
+      position: absolute;
+      top: 20px;
+      right: 32px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .vnu-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 1.5px solid #238843;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .vnu-logo-text {
+      color: #0b7234;
+      font-size: 1.05rem;
+      font-weight: 900;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vnu-logo-text span {
+      color: #df2128;
+    }
+
+    .vnu-sub {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #115729;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .is-badge {
+      background: #0f2c59;
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border: 1.5px solid var(--gold-primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .group-pill {
+      background: var(--silk-red-mid);
+      color: var(--gold-bright);
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border: 1px solid var(--gold-primary);
+    }
+
+    /* PHẦN NỘI DUNG CHÍNH (CONTENT AREA) */
+    .slide-body {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 35px 40px 65px 40px;
+    }
+
+    /* TIÊU ĐỀ SLIDE */
+    .slide-header {
+      text-align: center;
+      margin-top: 25px;
+      margin-bottom: 20px;
+    }
+
+    .header-pill {
+      display: inline-block;
+      background: linear-gradient(90deg, #aa1320, #780710);
+      color: #ffffff;
+      padding: 5px 22px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      box-shadow: 0 3px 10px rgba(120, 7, 16, 0.35);
+    }
+
+    .slide-title {
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: var(--text-maroon);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+    }
+
+    /* ĐƯỜNG TRANG TRÍ CHỈ VÀNG (DIVIDER CHUẨN SLIDE 6, 8, 14) */
+    .ornament-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 10px auto 18px;
+      width: 60%;
+    }
+
+    .ornament-line::before, .ornament-line::after {
+      content: "";
+      flex: 1;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #c9881a, transparent);
+    }
+
+    .ornament-diamond {
+      width: 7px;
+      height: 7px;
+      background: var(--gold-primary);
+      transform: rotate(45deg);
+    }
+
+    /* TIẾN TRÌNH */
+    .quiz-progress-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 720px;
+      margin: 0 auto 16px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+      padding: 6px 16px;
+      border-radius: 30px;
+    }
+
+    .quiz-progress-track {
+      flex: 1;
+      height: 7px;
+      background: #e2d6c3;
+      border-radius: 10px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+
+    .quiz-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #c9881a, #e62335);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+      width: 20%;
+    }
+
+    .quiz-progress-text {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-maroon);
+    }
+
+    /* CARD CÂU HỎI & CÁC LỰA CHỌN (CHUẨN SLIDE 9 & 10) */
+    .quiz-main-container {
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+    }
+
+    .question-box {
+      background: #ffffff;
+      border: 2px solid #dfa745;
+      border-radius: 18px;
+      padding: 18px 24px;
+      box-shadow: 0 6px 20px rgba(115, 13, 20, 0.12);
+      margin-bottom: 18px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .question-badge {
+      background: linear-gradient(135deg, #aa1320, #6e050c);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 50px;
+      white-space: nowrap;
+      border: 1px solid var(--gold-bright);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    .question-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+
+    /* LỰA CHỌN A B C D THEO PHONG CÁCH SLIDE 9 & 10 */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .option-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1.8px solid #d8a24c;
+      border-radius: 16px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      text-align: left;
+    }
+
+    .option-card:hover:not(.locked) {
+      background: #fff8eb;
+      border-color: #b31622;
+      transform: translateX(4px);
+      box-shadow: 0 6px 16px rgba(179, 22, 34, 0.18);
+    }
+
+    .opt-circle-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a3141f, #66050b);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+      border: 1px solid var(--gold-primary);
+      transition: all 0.2s;
+    }
+
+    .opt-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .opt-status-icon {
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin-left: 8px;
+      display: none;
+    }
+
+    /* TRẠNG THÁI ĐÚNG / SAI */
+    .option-card.correct {
+      background: var(--correct-light) !important;
+      border-color: #2e7d32 !important;
+    }
+    .option-card.correct .opt-circle-badge {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;
+      border-color: #81c784 !important;
+    }
+    .option-card.correct .opt-text {
+      color: #1b5e20 !important;
+      font-weight: 700;
+    }
+    .option-card.correct .opt-status-icon {
+      display: inline-block;
+      color: #2e7d32;
+    }
+
+    .option-card.wrong {
+      background: var(--wrong-light) !important;
+      border-color: #c62828 !important;
+    }
+    .option-card.wrong .opt-circle-badge {
+      background: linear-gradient(135deg, #c62828, #8e0000) !important;
+      border-color: #ef9a9a !important;
+    }
+    .option-card.wrong .opt-text {
+      color: #b71c1c !important;
+    }
+    .option-card.wrong .opt-status-icon {
+      display: inline-block;
+      color: #c62828;
+    }
+
+    /* KHUNG GIẢI THÍCH (THEO STYLE LỜI BÁC Ở SLIDE 11 & 17) */
+    .quote-explanation-box {
+      display: none;
+      background: linear-gradient(135deg, #780811 0%, #520208 100%);
+      border: 2px solid var(--gold-primary);
+      border-radius: 16px;
+      padding: 16px 22px;
+      margin-top: 16px;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    .quote-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--gold-bright);
+      font-family: Georgia, serif;
+      position: absolute;
+      top: 8px;
+      left: 14px;
+    }
+
+    .quote-body {
+      padding-left: 28px;
+    }
+
+    .quote-title {
+      color: var(--gold-bright);
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .quote-content {
+      font-size: 0.92rem;
+      font-weight: 500;
+      font-style: italic;
+      color: #fff6e8;
+      line-height: 1.5;
+    }
+
+    /* THANH NÚT ĐIỀU HƯỚNG */
+    .controls-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 18px;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #f5b71a 0%, #d48b0a 100%);
+      color: #420205;
+      font-weight: 800;
+      font-size: 0.92rem;
+      padding: 11px 28px;
+      border-radius: 50px;
+      border: 1px solid #ffe680;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(212, 139, 10, 0.4);
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(212, 139, 10, 0.6);
+      background: linear-gradient(135deg, #fed44b 0%, #e09614 100%);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* MÀN HÌNH TỔNG KẾT */
+    .summary-card {
+      display: none;
+      text-align: center;
+      padding: 30px 20px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .summary-score-badge {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #940f1a, #540207);
+      border: 3.5px solid var(--gold-primary);
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    }
+
+    .score-big {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--gold-bright);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffd4d4;
+    }
+
+    .summary-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--text-maroon);
+      margin-bottom: 8px;
+    }
+
+    .summary-desc {
+      font-size: 0.95rem;
+      color: #4a0409;
+      max-width: 580px;
+      margin: 0 auto 24px;
+      line-height: 1.5;
+    }
+
+    /* ĐẦM HOA SEN NỞ RỘ CHÂN TRANG (CHUẨN SLIDE 3, 9, 10) */
+    .lotus-pond-bottom {
+      position: absolute;
+      bottom: 42px;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      z-index: 2;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 15px;
+      opacity: 0.85;
+    }
+
+    /* SLOGAN CHÂN TRANG (DẢI ĐỎ CHỮ VÀNG CHUẨN SLIDE) */
+    .slide-footer-slogan {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(90deg, #3d0105 0%, #7d0b15 50%, #3d0105 100%);
+      border-top: 2px solid var(--gold-primary);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 15px;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .slogan-text {
+      color: var(--gold-bright);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      white-space: nowrap;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ĐÁP ỨNG THIẾT BỊ DI ĐỘNG */
+    @media (max-width: 800px) {
+      .dove-curve-layer {
+        width: 100%;
+        clip-path: none;
+        background: var(--cream-bg);
+      }
+      .party-emblem {
+        display: none;
+      }
+      .slide-canvas {
+        min-height: auto;
+        border-radius: 12px;
+      }
+      .slide-body {
+        padding: 60px 16px 65px;
+      }
+      .slide-title {
+        font-size: 1.18rem;
+      }
+      .slogan-text {
+        font-size: 0.68rem;
+        letter-spacing: 1px;
+      }
+      .branding-corner {
+        top: 12px;
+        right: 12px;
+      }
+      .vnu-sub {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOÀN BỘ KHUNG SLIDE TRÌNH CHIẾU -->
+  <div class="slide-canvas">
+    
+    <!-- LỚP ĐƯỜNG CONG BỒ CÂU TRẮNG TẠO MẢNG KEM -->
+    <div class="dove-curve-layer"></div>
+
+    <!-- BIỂU TƯỢNG BÚA LIỀM & SAO VÀNG (GÓC TRÁI NỀN LỤA ĐỎ) -->
+    <div class="party-emblem">
+      <!-- Búa liềm -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.93V19h-2v-2.07c-2.31-.4-4.14-2.12-4.66-4.43l1.94-.48c.37 1.63 1.74 2.87 3.42 2.97V11.2l-4.5-2.6 1-1.73L11 8.52V5h2v3.52l2.8-1.65 1 1.73-4.5 2.6v3.79c1.68-.1 3.05-1.34 3.42-2.97l1.94.48c-.52 2.31-2.35 4.03-4.66 4.43z"/>
+      </svg>
+      <!-- Sao vàng -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 1.5l3.09 6.26L22 8.77l-5 4.87 1.18 6.88L12 17.27l-6.18 3.25L7 13.64l-5-4.87 6.91-1.01L12 1.5z"/>
+      </svg>
+    </div>
+
+    <!-- LOGO ĐHQGHN - TRƯỜNG QUỐC TẾ & NHÓM 5 (GÓC TRÊN PHẢI) -->
+    <div class="branding-corner">
+      <div class="vnu-badge">
+        <div class="vnu-logo-text">VNU<span>★</span></div>
+        <div class="vnu-sub">ĐẠI HỌC QUỐC GIA<br>HÀ NỘI</div>
+      </div>
+      <div class="is-badge">VNU - IS</div>
+      <div class="group-pill">NHÓM 5</div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH CỦA TRÌNH LUYỆN TẬP -->
+    <div class="slide-body">
+      
+      <!-- TIÊU ĐỀ SLIDE (CHUẨN SLIDE 3 & 4) -->
+      <div class="slide-header">
+        <div class="header-pill">TƯ TƯỞNG HỒ CHÍ MINH VỀ</div>
+        <h1 class="slide-title">Các nguyên tắc xây dựng đạo đức cách mạng</h1>
+        <div class="ornament-line">
+          <div class="ornament-diamond"></div>
+        </div>
+      </div>
+
+      <!-- THANH ĐO TIẾN ĐỘ -->
+      <div class="quiz-progress-bar" id="progressBar">
+        <span class="quiz-progress-text" id="progressText">CÂU HỎI 1 / 5</span>
+        <div class="quiz-progress-track">
+          <div class="quiz-progress-fill" id="progressFill"></div>
+        </div>
+        <span class="quiz-progress-text" style="color: #b8860b;">HOÀN THÀNH</span>
+      </div>
+
+      <!-- BÀI TRẮC NGHIỆM ĐANG LÀM -->
+      <div class="quiz-main-container" id="quizActiveArea">
+        
+        <!-- THẺ CÂU HỎI -->
+        <div class="question-box">
+          <div class="question-badge" id="questionBadge">Câu 1</div>
+          <div class="question-title" id="questionTitle">Đang tải câu hỏi...</div>
+        </div>
+
+        <!-- 4 PHƯƠNG ÁN LỰA CHỌN (A, B, C, D) -->
+        <div class="options-list" id="optionsWrapper"></div>
+
+        <!-- KHUNG GIẢI THÍCH KIỂU TRÍCH DẪN (SLIDE 11 & 17) -->
+        <div class="quote-explanation-box" id="explanationBox">
+          <div class="quote-icon">“</div>
+          <div class="quote-body">
+            <div class="quote-title">Căn cứ & Giải thích tư tưởng:</div>
+            <div class="quote-content" id="explanationContent">...</div>
+          </div>
+        </div>
+
+        <!-- NÚT CHUYỂN TIẾP -->
+        <div class="controls-bar">
+          <button class="action-btn" id="nextQuestionBtn" onclick="handleNextQuestion()" disabled>
+            <span id="nextBtnLabel">Câu tiếp theo</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- MÀN HÌNH TỔNG KẾT KẾT QUẢ -->
+      <div class="summary-card" id="quizResultArea">
+        <div class="summary-score-badge">
+          <div class="score-big" id="finalScoreVal">0</div>
+          <div class="score-label">TRÊN 5 CÂU</div>
+        </div>
+        <h2 class="summary-title" id="finalTitle">KẾT QUẢ ÔN TẬP</h2>
+        <p class="summary-desc" id="finalDesc">Mô tả kết quả...</p>
+        <button class="action-btn" onclick="restartQuizEngine()">
+          <span>↻ Ôn luyện lại từ đầu</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- HỌA TIẾT HOA SEN DƯỚI ĐÁY CHÂN TRANG (VECTOR CHUẨN SLIDE 3) -->
+    <div class="lotus-pond-bottom">
+      <!-- Cụm sen bên trái -->
+      <svg width="160" height="65" viewBox="0 0 200 80" fill="none">
+        <path d="M40 70 C30 50, 10 40, 0 60 C30 80, 70 80, 40 70Z" fill="#2d6a4f" opacity="0.7"/>
+        <path d="M80 75 C70 45, 110 45, 100 75 Z" fill="#40916c"/>
+        <path d="M50 65 C45 35, 65 30, 60 65 Z" fill="#e27396"/>
+        <path d="M60 65 C60 25, 80 20, 75 65 Z" fill="#ea9ab2"/>
+        <circle cx="65" cy="40" r="4" fill="#ffd166"/>
+      </svg>
+      <!-- Cụm sen bên phải -->
+      <svg width="160" height="65" viewBox="0 0 200 80" fill="none">
+        <path d="M160 70 C170 50, 190 40, 200 60 C170 80, 130 80, 160 70Z" fill="#2d6a4f" opacity="0.7"/>
+        <path d="M120 75 C130 45, 90 45, 100 75 Z" fill="#40916c"/>
+        <path d="M150 65 C155 35, 135 30, 140 65 Z" fill="#e27396"/>
+        <path d="M140 65 C140 25, 120 20, 125 65 Z" fill="#ea9ab2"/>
+        <circle cx="135" cy="40" r="4" fill="#ffd166"/>
+      </svg>
+    </div>
+
+    <!-- RUY-BĂNG KHẨU HIỆU DƯỚI CÙNG (SLIDE FOOTER) -->
+    <footer class="slide-footer-slogan">
+      <div class="slogan-text">“DÂN GIÀU – NƯỚC MẠNH – DÂN CHỦ – CÔNG BẰNG – VĂN MINH”</div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Dữ liệu 5 câu hỏi nguyên bản được cung cấp
+    const quizData = [
+      {
+        question: "Theo tư tưởng Hồ Chí Minh, đâu là một trong 3 nguyên tắc cơ bản để thực hành và xây dựng đạo đức cách mạng?",
+        options: [
+          { key: "A", text: "Chỉ tu dưỡng đạo đức khi còn trẻ" },
+          { key: "B", text: "Xây đi đôi với chống" },
+          { key: "C", text: "Nói nhiều, làm ít" },
+          { key: "D", text: "Nói một đằng, làm một nẻo" }
+        ],
+        correctIndex: 1, // B
+        explanation: "3 nguyên tắc cơ bản gồm: Nói đi đôi với làm, nêu gương về đạo đức; Xây đi đôi với chống; Phải tu dưỡng đạo đức suốt đời."
+      },
+      {
+        question: "Để làm gương cho nguyên tắc \"Nói đi đôi với làm\", sau Cách mạng Tháng Tám năm 1945 đối mặt với nạn đói khủng khiếp, Bác Hồ đã tự mình thực hiện đều đặn hành động gì?",
+        options: [
+          { key: "A", text: "Đề nghị cứ mười ngày nhịn ăn một bữa, mỗi bữa một bơ để lấy gạo cứu đói" },
+          { key: "B", text: "Đi vận động quyên góp từ các nước bạn bè quốc tế" },
+          { key: "C", text: "Kêu gọi nhân dân nhịn ăn nhưng Bác thì không thực hiện" },
+          { key: "D", text: "Lấy gạo từ kho dự trữ của quân đội để chia cho dân" }
+        ],
+        correctIndex: 0, // A
+        explanation: "Bác đã tự mình thực hiện đều đặn, không bỏ sót một bữa nào để lấy gạo cứu đói, nêu gương sống động cho nhân dân."
+      },
+      {
+        question: "Bác Hồ chỉ rõ nguồn gốc của mọi thứ tệ nạn (quan liêu, tham ô, lãng phí) và được coi là \"kẻ địch hung ác\" trái ngược với đạo đức cách mạng là gì?",
+        options: [
+          { key: "A", text: "Chủ nghĩa tư bản" },
+          { key: "B", text: "Lối sống thực dụng" },
+          { key: "C", text: "Chủ nghĩa cá nhân" },
+          { key: "D", text: "Sự thiếu thốn vật chất" }
+        ],
+        correctIndex: 2, // C
+        explanation: "Bác nhấn mạnh phải kiên quyết quét sạch chủ nghĩa cá nhân, bồi dưỡng tư tưởng tập thể và tinh thần đoàn kết."
+      },
+      {
+        question: "Để tiếp nối và hiện thực hóa tư tưởng Hồ Chí Minh trong giai đoạn hiện nay, ngày 09/5/2024, Bộ Chính trị đã ban hành Quy định nào về chuẩn mực đạo đức cách mạng của cán bộ, đảng viên?",
+        options: [
+          { key: "A", text: "Quy định số 19-QĐ/TW" },
+          { key: "B", text: "Quy định số 14-QĐ/TW" },
+          { key: "C", text: "Quy định số 2026-QĐ/TW" },
+          { key: "D", text: "Quy định số 144-QĐ/TW" }
+        ],
+        correctIndex: 3, // D
+        explanation: "Quy định 144-QĐ/TW gồm 5 chuẩn mực cụ thể hóa các yêu cầu về đạo đức cách mạng trong giai đoạn mới."
+      },
+      {
+        question: "Trong Diễn văn bế mạc Đại hội XIV, Tổng Bí thư Tô Lâm nhấn mạnh tinh thần xuyên suốt: \"nói là làm, làm ngay, làm đúng, làm quyết liệt, làm đến cùng và làm hiệu quả\". Đây là sự tiếp nối nguyên tắc đạo đức nào của Bác Hồ?",
+        options: [
+          { key: "A", text: "Nói đi đôi với làm" },
+          { key: "B", text: "Xây đi đôi với chống" },
+          { key: "C", text: "Tu dưỡng đạo đức suốt đời" },
+          { key: "D", text: "Trung với nước, hiếu với dân" }
+        ],
+        correctIndex: 0, // A
+        explanation: "Tinh thần \"nói là làm...\" chính là sự tiếp nối và cụ thể hóa nguyên tắc \"Nói đi đôi với làm, nêu gương về đạo đức\"."
+      }
+    ];
+
+    let currentQIndex = 0;
+    let userScore = 0;
+    let isAnswerSelected = false;
+
+    // DOM Elements
+    const questionBadge = document.getElementById("questionBadge");
+    const questionTitle = document.getElementById("questionTitle");
+    const optionsWrapper = document.getElementById("optionsWrapper");
+    const explanationBox = document.getElementById("explanationBox");
+    const explanationContent = document.getElementById("explanationContent");
+    const nextQuestionBtn = document.getElementById("nextQuestionBtn");
+    const nextBtnLabel = document.getElementById("nextBtnLabel");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+
+    const quizActiveArea = document.getElementById("quizActiveArea");
+    const quizResultArea = document.getElementById("quizResultArea");
+    const finalScoreVal = document.getElementById("finalScoreVal");
+    const finalTitle = document.getElementById("finalTitle");
+    const finalDesc = document.getElementById("finalDesc");
+
+    function renderQuestion() {
+      isAnswerSelected = false;
+      nextQuestionBtn.disabled = true;
+      explanationBox.style.display = "none";
+
+      const currentItem = quizData[currentQIndex];
+      questionBadge.textContent = `Câu ${currentQIndex + 1}`;
+      questionTitle.textContent = currentItem.question;
+
+      // Cập nhật thanh tiến trình
+      const pct = ((currentQIndex + 1) / quizData.length) * 100;
+      progressFill.style.width = `${pct}%`;
+      progressText.textContent = `CÂU HỎI ${currentQIndex + 1} / ${quizData.length}`;
+
+      // Xóa và nạp danh sách đáp án
+      optionsWrapper.innerHTML = "";
+      currentItem.options.forEach((opt, idx) => {
+        const card = document.createElement("div");
+        card.className = "option-card";
+        card.innerHTML = `
+          <div class="opt-circle-badge">${opt.key}</div>
+          <div class="opt-text">${opt.text}</div>
+          <div class="opt-status-icon"></div>
+        `;
+        card.onclick = () => onSelectOption(idx, card);
+        optionsWrapper.appendChild(card);
+      });
+
+      // Tên nút chuyển tiếp
+      if (currentQIndex === quizData.length - 1) {
+        nextBtnLabel.textContent = "Xem kết quả bài làm";
+      } else {
+        nextBtnLabel.textContent = "Câu tiếp theo";
+      }
+    }
+
+    function onSelectOption(indexChosen, selectedCard) {
+      if (isAnswerSelected) return;
+      isAnswerSelected = true;
+
+      const currentItem = quizData[currentQIndex];
+      const allCards = optionsWrapper.querySelectorAll(".option-card");
+
+      // Khóa tương tác
+      allCards.forEach(c => c.classList.add("locked"));
+
+      // Kiểm tra câu trả lời
+      if (indexChosen === currentItem.correctIndex) {
+        userScore++;
+        selectedCard.classList.add("correct");
+        selectedCard.querySelector(".opt-status-icon").textContent = "✓";
+      } else {
+        selectedCard.classList.add("wrong");
+        selectedCard.querySelector(".opt-status-icon").textContent = "✕";
+        // Bật đáp án đúng lên
+        const rightCard = allCards[currentItem.correctIndex];
+        rightCard.classList.add("correct");
+        rightCard.querySelector(".opt-status-icon").textContent = "✓";
+      }
+
+      // Hiện khung giải thích
+      explanationContent.textContent = currentItem.explanation;
+      explanationBox.style.display = "block";
+
+      // Cho phép bấm nút tiếp theo
+      nextQuestionBtn.disabled = false;
+    }
+
+    function handleNextQuestion() {
+      if (currentQIndex < quizData.length - 1) {
+        currentQIndex++;
+        renderQuestion();
+      } else {
+        displayResults();
+      }
+    }
+
+    function displayResults() {
+      quizActiveArea.style.display = "none";
+      progressBar.style.display = "none";
+      quizResultArea.style.display = "block";
+
+      finalScoreVal.textContent = userScore;
+
+      if (userScore === 5) {
+        finalTitle.textContent = "XUẤT SẮC - ĐẠT 100% ĐIỂM SỐ!";
+        finalDesc.textContent = "Chúc mừng bạn! Bạn đã nắm rất vững toàn bộ 3 nguyên tắc xây dựng đạo đức cách mạng theo Tư tưởng Hồ Chí Minh và các nội dung cập nhật mới nhất từ Đại hội XIV.";
+      } else if (userScore >= 3) {
+        finalTitle.textContent = "KẾT QUẢ TỐT - ĐÃ NẮM VỮNG BÀI!";
+        finalDesc.textContent = `Bạn đã đúng ${userScore}/5 câu hỏi. Hãy rèn luyện thêm một lần nữa để đạt điểm tuyệt đối nhé!`;
+      } else {
+        finalTitle.textContent = "CẦN ÔN LẠI BÀI THUYẾT TRÌNH!";
+        finalDesc.textContent = `Bạn đạt ${userScore}/5 câu. Hãy xem lại kỹ nội dung trình bày của Nhóm 5 để củng cố các nguyên tắc cốt lõi.`;
+      }
+    }
+
+    function restartQuizEngine() {
+      currentQIndex = 0;
+      userScore = 0;
+      quizActiveArea.style.display = "block";
+      progressBar.style.display = "flex";
+      quizResultArea.style.display = "none";
+      renderQuestion();
+    }
+
+    // Khởi chạy khi load trang
+    renderQuestion();
+  </script>
+</body>
+</html>
